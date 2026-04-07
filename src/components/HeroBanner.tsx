@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { heroBanner } from "@/data/siteContent";
+import { getHeroBanner } from "@/data/siteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowRight, Smartphone } from "lucide-react";
 
 export default function HeroBanner() {
+  const { t } = useLanguage();
+  const heroBanner = getHeroBanner(t);
   return (
     <section className="relative overflow-hidden bg-dark">
       {/* Background image */}

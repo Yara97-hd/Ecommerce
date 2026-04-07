@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { customers as initialCustomers, type Customer } from "@/data/adminData";
-import { brand } from "@/data/siteContent";
+import { getBrand } from "@/data/siteContent";
 import {
   Search,
   Users,
@@ -16,11 +17,16 @@ import {
 } from "lucide-react";
 
 export default function AdminCustomersPage() {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
   const [customerList] = useState<Customer[]>(initialCustomers);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "Active" | "Inactive">("all");
   const [sortField, setSortField] = useState<"totalSpent" | "totalOrders" | "joinedDate">("totalSpent");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState<Partial<Customer>>({});
+  const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState<Customer | null>(null);
 
   const filtered = customerList
@@ -49,6 +55,35 @@ export default function AdminCustomersPage() {
       setSortDir("desc");
     }
   };
+
+  const handleEditStart = () => {
+    setEditForm({ ...selected });
+    setEditMode(true);
+  };
+
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: name === "totalSpent" || name === "totalOrders" ? Number(value) : value,
+    }));
+  };
+
+  const handleEditSave = async () => {
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setSaving(false);
+    setEditMode(false);
+    if (editForm && selected) {
+      const updated = { ...selected, ...editForm };
+      setSelected(updated);
+    }
+  };
+
+  const inputClass =
+    "w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors";
 
   const SortIcon = ({ field }: { field: typeof sortField }) =>
     sortField === field ? (
@@ -224,8 +259,8 @@ export default function AdminCustomersPage() {
             <div className="p-6 space-y-6">
               {/* Header */}
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold text-lg">
+                <div className="flex items-center gap-3" >
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm shrink-0">
                     {selected.name
                       .split(" ")
                       .map((n) => n[0])
@@ -234,78 +269,191 @@ export default function AdminCustomersPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">
-                      {selected.name}
+                      {editMode ? "Edit Customer" : selected.name}
                     </h2>
-                    <span
-                      className={`text-[11px] font-medium px-2.5 py-0.5 rounded-lg ${
-                        selected.status === "Active"
-                          ? "bg-emerald-500/10 text-emerald-400"
-                          : "bg-gray-500/10 text-gray-400"
-                      }`}
-                    >
-                      {selected.status}
-                    </span>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {editMode ? "Update customer information" : `ID: ${selected.id}`}
+                    </p>
                   </div>
                 </div>
                 <button
-                  onClick={() => setSelected(null)}
+                  onClick={() => {
+                    setSelected(null);
+                    setEditMode(false);
+                  }}
                   className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-xl transition-colors"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              {/* Info cards */}
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
-                  <Mail size={16} className="text-gray-500 shrink-0" />
-                  <span className="text-sm text-gray-300">
-                    {selected.email}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
-                  <Phone size={16} className="text-gray-500 shrink-0" />
-                  <span className="text-sm text-gray-300">
-                    {selected.phone}
-                  </span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
-                  <Calendar size={16} className="text-gray-500 shrink-0" />
-                  <span className="text-sm text-gray-300">
-                    Joined {selected.joinedDate}
-                  </span>
-                </div>
+              {/* Edit/Save Buttons */}
+              <div className="flex gap-2">
+                {!editMode ? (
+                  <button
+                    onClick={handleEditStart}
+                    className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-xl text-sm font-semibold transition-colors"
+                  >
+                    Edit Customer
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={handleEditSave}
+                      disabled={saving}
+                      className="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                    >
+                      {saving ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        "Save"
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setEditMode(false)}
+                      className="flex-1 px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-sm font-semibold transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </>
+                )}
               </div>
 
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-gray-900 rounded-xl p-4 text-center">
-                  <ShoppingBag
-                    size={20}
-                    className="text-blue-400 mx-auto mb-2"
-                  />
-                  <p className="text-2xl font-bold text-white">
-                    {selected.totalOrders}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">Total Orders</p>
+              {/* Edit Form or Info Display */}
+              {editMode ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={editForm.name || ""}
+                      onChange={handleEditChange}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Email Address
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={editForm.email || ""}
+                      onChange={handleEditChange}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={editForm.phone || ""}
+                      onChange={handleEditChange}
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      value={editForm.status || "Active"}
+                      onChange={handleEditChange}
+                      className={inputClass}
+                    >
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                        Total Orders
+                      </label>
+                      <input
+                        type="number"
+                        name="totalOrders"
+                        value={editForm.totalOrders || 0}
+                        onChange={handleEditChange}
+                        className={inputClass}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                        Total Spent
+                      </label>
+                      <input
+                        type="number"
+                        name="totalSpent"
+                        value={editForm.totalSpent || 0}
+                        onChange={handleEditChange}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-gray-900 rounded-xl p-4 text-center">
-                  <span className="text-emerald-400 text-lg font-bold block mb-1">
-                    {brand.currency}
-                  </span>
-                  <p className="text-2xl font-bold text-white">
-                    {selected.totalSpent.toLocaleString()}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">Total Spent</p>
-                </div>
-              </div>
+              ) : (
+                <>
+                  {/* Info cards */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
+                      <Mail size={16} className="text-gray-500 shrink-0" />
+                      <span className="text-sm text-gray-300">
+                        {selected.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
+                      <Phone size={16} className="text-gray-500 shrink-0" />
+                      <span className="text-sm text-gray-300">
+                        {selected.phone}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-gray-900 rounded-xl">
+                      <Calendar size={16} className="text-gray-500 shrink-0" />
+                      <span className="text-sm text-gray-300">
+                        Joined {selected.joinedDate}
+                      </span>
+                    </div>
+                  </div>
 
-              <div className="bg-gray-900 rounded-xl p-4">
-                <p className="text-xs text-gray-500 mb-1">Last Order</p>
-                <p className="text-sm font-medium text-white">
-                  {selected.lastOrder}
-                </p>
-              </div>
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-gray-900 rounded-xl p-4 text-center">
+                      <ShoppingBag
+                        size={20}
+                        className="text-blue-400 mx-auto mb-2"
+                      />
+                      <p className="text-2xl font-bold text-white">
+                        {selected.totalOrders}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">Total Orders</p>
+                    </div>
+                    <div className="bg-gray-900 rounded-xl p-4 text-center">
+                      <span className="text-emerald-400 text-lg font-bold block mb-1">
+                        {brand.currency}
+                      </span>
+                      <p className="text-2xl font-bold text-white">
+                        {selected.totalSpent.toLocaleString()}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">Total Spent</p>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-900 rounded-xl p-4">
+                    <p className="text-xs text-gray-500 mb-1">Last Order</p>
+                    <p className="text-sm font-medium text-white">
+                      {selected.lastOrder}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </>

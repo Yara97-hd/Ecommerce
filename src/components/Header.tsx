@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { brand, navLinks } from "@/data/siteContent";
+import { getBrand, getNavLinks } from "@/data/siteContent";
+import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Search,
   ShoppingCart,
@@ -17,6 +19,47 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [languageOpen, setLanguageOpen] = useState(false);
+  const { getTotalItems } = useCart();
+  const { language, setLanguage, direction, t } = useLanguage();
+
+  const brand = getBrand(t);
+  const navLinks = getNavLinks(t);
+
+  const searchRef = useRef<HTMLDivElement>(null);
+  const languageRef = useRef<HTMLDivElement>(null);
+
+  const languages = [
+    { code: "en" as const, name: "English", flag: "🇺🇸", display: "EN" },
+    { code: "ar" as const, name: "العربية", flag: "🇸🇦", display: "عربي" },
+  ];
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setSearchOpen(false);
+      }
+      if (languageRef.current && !languageRef.current.contains(event.target as Node)) {
+        setLanguageOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLanguageChange = (languageCode: "en" | "ar") => {
+    setLanguage(languageCode);
+    setLanguageOpen(false);
+  };
+
+  const handleSearch = (query: string) => {
+    if (query.trim()) {
+      // In a real app, this would navigate to search results
+      console.log(`Searching for: ${query}`);
+      setSearchOpen(false);
+    }
+  };
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm">
@@ -26,7 +69,7 @@ export default function Header() {
           <button
             className="lg:hidden p-2 -ml-2 text-gray-700 hover:text-primary transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
+            aria-label={t("common.menu")}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -82,47 +125,78 @@ export default function Header() {
           {/* Right actions */}
           <div className="flex items-center gap-2">
             {/* Search */}
-            <div className="relative">
+            <div className="relative" ref={searchRef}>
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"
-                aria-label="Search"
+                aria-label={t("common.search")}
               >
                 <Search size={20} />
               </button>
               {searchOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 p-3 animate-fade-in-up">
+                <div className={`absolute ${direction === "rtl" ? "left-0" : "right-0"} top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 p-3 animate-fade-in-up`}>
                   <input
                     type="text"
-                    placeholder="What are you looking for..."
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    placeholder={t("common.searchPlaceholder")}
+                    className={`w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 ${direction === "rtl" ? "text-right" : "text-left"}`}
                     autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleSearch((e.target as HTMLInputElement).value);
+                      } else if (e.key === "Escape") {
+                        setSearchOpen(false);
+                      }
+                    }}
                   />
                 </div>
               )}
             </div>
 
-            <button
-              className="p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 hidden sm:flex"
-              aria-label="Language"
-            >
-              <Globe size={20} />
-            </button>
-
-            <button
-              className="p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 hidden sm:flex"
-              aria-label="Account"
-            >
-              <User size={20} />
-            </button>
+            <div className="relative" ref={languageRef}>
+              <button
+                onClick={() => setLanguageOpen(!languageOpen)}
+                className="flex items-center gap-1 p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"
+                aria-label={t("common.language")}
+              >
+                <Globe size={20} />
+                <span className="text-xs font-medium">
+                  {languages.find(lang => lang.code === language)?.display || "EN"}
+                </span>
+              </button>
+              {languageOpen && (
+                <div className={`absolute ${direction === "rtl" ? "left-0" : "right-0"} top-full mt-2 w-40 bg-white rounded-xl shadow-xl border border-gray-100 py-2 animate-fade-in-up`}>
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleLanguageChange(lang.code)}
+                      className={`w-full flex items-center gap-3 px-4 py-2 ${direction === "rtl" ? "text-right flex-row-reverse" : "text-left"} hover:bg-gray-50 transition-colors ${
+                        language === lang.code ? "bg-primary/5 text-primary" : "text-gray-700"
+                      }`}
+                    >
+                      <span className="text-lg">{lang.flag}</span>
+                      <span className="text-sm font-medium">{lang.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <Link
-              href="#"
+              href="/account"
+              className="p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100 hidden sm:flex"
+              aria-label={t("common.account")}
+            >
+              <User size={20} />
+            </Link>
+
+            <Link
+              href="/cart"
               className="relative p-2 text-gray-600 hover:text-primary transition-colors rounded-lg hover:bg-gray-100"
+              aria-label={t("common.cart")}
             >
               <ShoppingCart size={20} />
               <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                0
+                {getTotalItems()}
               </span>
             </Link>
           </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { brand } from "@/data/siteContent";
+import { translations } from "@/data/translations";
 import "./globals.css";
+
+const brand = translations.en.brand;
 
 export const metadata: Metadata = {
   title: `${brand.name} — ${brand.tagline}`,
@@ -13,14 +15,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased" suppressHydrationWarning={true}>{children}</body>
     </html>
   );
 }

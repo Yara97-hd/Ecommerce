@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { orders as initialOrders, type Order, type OrderStatus } from "@/data/adminData";
-import { brand } from "@/data/siteContent";
+import { getBrand } from "@/data/siteContent";
 import Link from "next/link";
 import {
   Search,
@@ -29,6 +30,8 @@ const allStatuses: OrderStatus[] = [
 ];
 
 export default function AdminOrdersPage() {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
   const [orderList] = useState<Order[]>(initialOrders);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | OrderStatus>("all");

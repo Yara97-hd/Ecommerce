@@ -13,16 +13,17 @@ import {
   Shield,
   Bell,
   Palette,
+  Megaphone,
 } from "lucide-react";
 
 export default function AdminSettingsPage() {
   const [form, setForm] = useState({ ...adminSettings });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [activeTab, setActiveTab] = useState<"general" | "shipping" | "notifications">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "shipping" | "notifications" | "announcement">("general");
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value, type } = e.target;
     setForm((prev) => ({
@@ -48,6 +49,7 @@ export default function AdminSettingsPage() {
     { id: "general" as const, label: "General", icon: Store },
     { id: "shipping" as const, label: "Shipping & Returns", icon: Truck },
     { id: "notifications" as const, label: "Notifications", icon: Bell },
+    { id: "announcement" as const, label: "Announcement", icon: Megaphone },
   ];
 
   return (
@@ -308,6 +310,64 @@ export default function AdminSettingsPage() {
                   </div>
                 </label>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Announcement */}
+        {activeTab === "announcement" && (
+          <div className="space-y-6">
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-5">
+              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                <Megaphone size={18} className="text-primary" />
+                Announcement Bar
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className={labelClass}>Announcement Text</label>
+                  <textarea
+                    name="announcementText"
+                    value={form.announcementText}
+                    onChange={handleChange}
+                    placeholder="Enter your announcement message..."
+                    rows={3}
+                    className={inputClass}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    This text will appear in the announcement bar at the top of your store.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    name="announcementEnabled"
+                    checked={form.announcementEnabled}
+                    onChange={(e) => setForm((prev) => ({ ...prev, announcementEnabled: e.target.checked }))}
+                    className="w-5 h-5 rounded-md border-gray-600 bg-gray-800 text-primary focus:ring-primary/20 cursor-pointer"
+                  />
+                  <div>
+                    <label className="text-sm font-medium text-gray-300 cursor-pointer">
+                      Enable Announcement Bar
+                    </label>
+                    <p className="text-xs text-gray-500">
+                      Show/hide the announcement bar on your store
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 space-y-4">
+              <h3 className="text-sm font-semibold text-white">Preview</h3>
+              <div className="bg-primary text-white text-center py-2 px-4 text-sm font-medium rounded-lg">
+                {form.announcementText || "Your announcement text will appear here"}
+              </div>
+              {!form.announcementEnabled && (
+                <p className="text-xs text-amber-400">
+                  Announcement bar is currently disabled
+                </p>
+              )}
             </div>
           </div>
         )}

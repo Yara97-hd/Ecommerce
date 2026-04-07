@@ -1,8 +1,9 @@
 "use client";
 
 import { use, useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { orders, type OrderStatus } from "@/data/adminData";
-import { brand } from "@/data/siteContent";
+import { getBrand } from "@/data/siteContent";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -46,6 +47,8 @@ export default function OrderDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
   const { id } = use(params);
   const order = orders.find((o) => o.id === id);
   const [status, setStatus] = useState<OrderStatus>(

@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   dashboardStats,
   revenueChartData,
@@ -7,7 +9,7 @@ import {
   orders,
   recentActivity,
 } from "@/data/adminData";
-import { brand } from "@/data/siteContent";
+import { getBrand } from "@/data/siteContent";
 import Link from "next/link";
 import {
   DollarSign,
@@ -25,6 +27,8 @@ import {
   Star,
   RotateCcw,
   AlertTriangle,
+  Edit2,
+  Save,
 } from "lucide-react";
 
 const activityIcons: Record<string, React.ReactNode> = {
@@ -56,34 +60,60 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
+  const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editStats, setEditStats] = useState({ ...dashboardStats });
+
+  const handleEditChange = (field: string, value: number) => {
+    setEditStats((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSaveStats = async () => {
+    setSaving(true);
+    await new Promise((r) => setTimeout(r, 800));
+    setSaving(false);
+    setEditMode(false);
+  };
+
+  const currentStats = editMode ? editStats : dashboardStats;
+
   const stats = [
     {
       label: "Total Revenue",
-      value: `${brand.currency} ${dashboardStats.totalRevenue.toLocaleString()}`,
-      change: dashboardStats.revenueChange,
+      value: `${brand.currency} ${currentStats.totalRevenue.toLocaleString()}`,
+      change: currentStats.revenueChange,
       icon: DollarSign,
       color: "bg-emerald-500/10 text-emerald-400",
+      field: "totalRevenue",
     },
     {
       label: "Total Orders",
-      value: dashboardStats.totalOrders.toLocaleString(),
-      change: dashboardStats.ordersChange,
+      value: currentStats.totalOrders.toLocaleString(),
+      change: currentStats.ordersChange,
       icon: ShoppingCart,
       color: "bg-blue-500/10 text-blue-400",
+      field: "totalOrders",
     },
     {
       label: "Total Customers",
-      value: dashboardStats.totalCustomers.toLocaleString(),
-      change: dashboardStats.customersChange,
+      value: currentStats.totalCustomers.toLocaleString(),
+      change: currentStats.customersChange,
       icon: Users,
       color: "bg-purple-500/10 text-purple-400",
+      field: "totalCustomers",
     },
     {
       label: "Total Products",
-      value: dashboardStats.totalProducts.toLocaleString(),
-      change: dashboardStats.productsChange,
+      value: currentStats.totalProducts.toLocaleString(),
+      change: currentStats.productsChange,
       icon: Package,
       color: "bg-amber-500/10 text-amber-400",
+      field: "totalProducts",
     },
   ];
 
@@ -91,11 +121,48 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-        <p className="text-gray-400 text-sm mt-1">
-          Welcome back. Here&apos;s what&apos;s happening with your store.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+          <p className="text-gray-400 text-sm mt-1">
+            Welcome back. Here&apos;s what&apos;s happening with your store.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {!editMode ? (
+            <button
+              onClick={() => setEditMode(true)}
+              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+            >
+              <Edit2 size={16} />
+              Edit Stats
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleSaveStats}
+                disabled={saving}
+                className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-60"
+              >
+                {saving ? (
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : (
+                  <Save size={16} />
+                )}
+                Save
+              </button>
+              <button
+                onClick={() => {
+                  setEditMode(false);
+                  setEditStats({ ...dashboardStats });
+                }}
+                className="inline-flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-gray-300 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -106,25 +173,45 @@ export default function AdminDashboard() {
           return (
             <div
               key={stat.label}
-              className="bg-gray-900 border border-gray-800 rounded-2xl p-5 hover:border-gray-700 transition-colors"
+              className={`bg-gray-900 border rounded-2xl p-5 transition-colors ${
+                editMode ? "border-primary/30" : "border-gray-800 hover:border-gray-700"
+              }`}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
-                  <Icon size={22} />
+              {editMode ? (
+                <div className="space-y-3">
+                  <label className="block text-xs font-medium text-gray-400">
+                    {stat.label}
+                  </label>
+                  <input
+                    type="number"
+                    value={(editStats as any)[stat.field] || 0}
+                    onChange={(e) =>
+                      handleEditChange(stat.field, Number(e.target.value))
+                    }
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white focus:outline-none focus:border-primary transition-colors"
+                  />
                 </div>
-                <div
-                  className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${
-                    isPositive
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : "bg-red-500/10 text-red-400"
-                  }`}
-                >
-                  {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                  {Math.abs(stat.change)}%
-                </div>
-              </div>
-              <p className="text-2xl font-bold text-white">{stat.value}</p>
-              <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${stat.color}`}>
+                      <Icon size={22} />
+                    </div>
+                    <div
+                      className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${
+                        isPositive
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : "bg-red-500/10 text-red-400"
+                      }`}
+                    >
+                      {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                      {Math.abs(stat.change)}%
+                    </div>
+                  </div>
+                  <p className="text-2xl font-bold text-white">{stat.value}</p>
+                  <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+                </>
+              )}
             </div>
           );
         })}

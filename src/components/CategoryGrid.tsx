@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { categories } from "@/data/siteContent";
+import { getCategories } from "@/data/siteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CategoryGrid() {
+  const { t } = useLanguage();
+  const categories = getCategories(t);
   return (
     <section className="max-w-7xl mx-auto px-4 py-14">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">

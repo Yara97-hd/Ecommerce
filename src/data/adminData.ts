@@ -245,4 +245,6 @@ export const adminSettings = {
   freeShippingThreshold: 500,
   returnDays: 10,
   warrantyMonths: 12,
+  announcementText: "EXCLUSIVE SALE: GET 75 AED OFF! USE CODE CARD75",
+  announcementEnabled: true,
 };

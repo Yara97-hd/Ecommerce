@@ -1,10 +1,13 @@
 "use client";
 
-import { announcement } from "@/data/siteContent";
+import { getAnnouncement } from "@/data/siteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useState } from "react";
 import { X } from "lucide-react";
 
 export default function AnnouncementBar() {
+  const { t } = useLanguage();
+  const announcement = getAnnouncement(t);
   const [visible, setVisible] = useState(announcement.enabled);
 
   if (!visible) return null;
@@ -15,7 +18,7 @@ export default function AnnouncementBar() {
       <button
         onClick={() => setVisible(false)}
         className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition-opacity"
-        aria-label="Close announcement"
+        aria-label={t("common.close")}
       >
         <X size={16} />
       </button>

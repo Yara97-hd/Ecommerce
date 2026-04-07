@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AdminAuthProvider } from "@/contexts/AdminAuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Admin — Revibe",
@@ -10,5 +11,9 @@ export default function AdminRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AdminAuthProvider>{children}</AdminAuthProvider>;
+  return (
+    <LanguageProvider>
+      <AdminAuthProvider>{children}</AdminAuthProvider>
+    </LanguageProvider>
+  );
 }

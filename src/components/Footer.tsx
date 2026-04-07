@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
-import { brand, footer, trustBadges } from "@/data/siteContent";
+import { getBrand, getFooter, getTrustBadges } from "@/data/siteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Shield, Truck, RefreshCw, CreditCard, Mail, Phone, Facebook, Instagram } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -10,6 +13,11 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function Footer() {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
+  const footer = getFooter(t);
+  const trustBadges = getTrustBadges(t);
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Trust badges bar */}
@@ -145,7 +153,7 @@ export default function Footer() {
       <div className="border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <p className="text-center text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} {brand.name}. All rights reserved.
+            {footer.copyright.replace("2024", new Date().getFullYear().toString())}
           </p>
         </div>
       </div>

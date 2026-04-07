@@ -1,8 +1,14 @@
-import { products, brand, trustBadges } from "@/data/siteContent";
-import { getDiscountPercent } from "@/lib/api";
+"use client";
+
+import { products, getBrand, getTrustBadges, type ProductCondition } from "@/data/siteContent";
+import { formatPrice, formatNumber, getDiscountPercent } from "@/lib/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ProductCard from "@/components/ProductCard";
 import Link from "next/link";
 import Image from "next/image";
+import { useCart } from "@/contexts/CartContext";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import {
   ChevronRight,
   Shield,
@@ -21,13 +27,30 @@ const iconMap: Record<string, React.ReactNode> = {
   creditCard: <CreditCard size={18} />,
 };
 
-interface ProductPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { id } = await params;
+export default function ProductPage() {
+  const params = useParams();
+  const id = typeof params?.id === "string" ? params.id : "";
   const product = products.find((p) => p.id === id);
+  const { addToCart } = useCart();
+  const { t } = useLanguage();
+  const brand = getBrand(t);
+  const trustBadges = getTrustBadges(t);
+  const [selectedCondition, setSelectedCondition] = useState<ProductCondition>("Excellent");
+  const [isAdding, setIsAdding] = useState(false);
+
+  useEffect(() => {
+    if (product) {
+      setSelectedCondition(product.condition);
+    }
+  }, [product]);
+
+  const handleAddToCart = () => {
+    if (!product || isAdding) return;
+
+    setIsAdding(true);
+    addToCart(product, selectedCondition);
+    window.setTimeout(() => setIsAdding(false), 150);
+  };
 
   if (!product) {
     return (
@@ -128,15 +151,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <div className="bg-gray-50 rounded-2xl p-6 mb-6">
             <div className="flex items-baseline gap-3 mb-2">
               <span className="text-4xl font-bold text-gray-900">
-                {brand.currency} {product.price.toLocaleString()}
+                {formatPrice(product.price)}
               </span>
               <span className="text-lg text-gray-400 line-through">
-                {brand.currency} {product.originalPrice.toLocaleString()}
+                {formatPrice(product.originalPrice)}
               </span>
             </div>
             <p className="text-sm text-success font-medium">
-              You save {brand.currency}{" "}
-              {(product.originalPrice - product.price).toLocaleString()} (
+              You save {formatPrice(product.originalPrice - product.price)} (
               {discount}% off)
             </p>
           </div>
@@ -149,8 +171,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
               {(["Excellent", "Good", "Fair"] as const).map((cond) => (
                 <button
                   key={cond}
+                  onClick={() => setSelectedCondition(cond)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-                    product.condition === cond
+                    selectedCondition === cond
                       ? "border-primary bg-primary/5 text-primary"
                       : "border-gray-200 text-gray-500 hover:border-gray-300"
                   }`}
@@ -163,12 +186,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
           <div className="flex gap-3 mb-8">
             <button
-              disabled={!product.inStock}
+              type="button"
+              disabled={!product.inStock || isAdding}
+              onClick={handleAddToCart}
               className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-xl font-semibold text-lg transition-all ${
                 product.inStock
                   ? "bg-primary text-white hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
-              }`}
+              } ${isAdding ? "opacity-80 pointer-events-none" : ""}`}
             >
               <ShoppingCart size={20} />
               {product.inStock ? "Add to Cart" : "Out of Stock"}

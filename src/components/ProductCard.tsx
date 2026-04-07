@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { type Product } from "@/data/siteContent";
-import { brand } from "@/data/siteContent";
-import { getDiscountPercent } from "@/lib/api";
+import { formatPrice, getDiscountPercent } from "@/lib/api";
 import { Zap } from "lucide-react";
 
 interface ProductCardProps {
@@ -73,10 +72,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         </p>
         <div className="flex items-baseline gap-2">
           <span className="text-lg font-bold text-gray-900">
-            {brand.currency} {product.price.toLocaleString()}
+            {formatPrice(product.price)}
           </span>
           <span className="text-sm text-gray-400 line-through">
-            {brand.currency} {product.originalPrice.toLocaleString()}
+            {formatPrice(product.originalPrice)}
           </span>
         </div>
       </div>

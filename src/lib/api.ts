@@ -44,10 +44,16 @@ export async function searchProducts(query: string): Promise<Product[]> {
   );
 }
 
+const priceFormatter = new Intl.NumberFormat("en-US");
+
 export function getDiscountPercent(price: number, originalPrice: number): number {
   return Math.round(((originalPrice - price) / originalPrice) * 100);
 }
 
 export function formatPrice(price: number, currency = "AED"): string {
-  return `${currency} ${price.toLocaleString()}`;
+  return `${currency} ${priceFormatter.format(price)}`;
+}
+
+export function formatNumber(value: number): string {
+  return priceFormatter.format(value);
 }

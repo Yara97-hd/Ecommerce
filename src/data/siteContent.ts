@@ -2,136 +2,148 @@
 // SITE CONTENT - Edit all your images, text, and products here
 // ============================================================================
 
+import { adminSettings } from "./adminData";
+
 // --- BRAND ---
-export const brand = {
-  name: "Revibe",
-  tagline: "Best Place for Refurbished & Used Electronics",
+export const getBrand = (t: (key: string) => string) => ({
+  name: t("brand.name"),
+  tagline: t("brand.tagline"),
   logo: "/images/logo.svg",
-  currency: "AED",
-  country: "UAE",
-};
+  currency: t("brand.currency"),
+  country: t("brand.country"),
+});
 
 // --- ANNOUNCEMENT BAR ---
-export const announcement = {
-  text: "EXCLUSIVE SALE: GET 75 AED OFF! USE CODE CARD75",
-  enabled: true,
-};
+export const getAnnouncement = (t: (key: string) => string) => ({
+  text: adminSettings.announcementText,
+  enabled: adminSettings.announcementEnabled,
+});
 
 // --- NAVIGATION ---
-export const navLinks = [
+export const getNavLinks = (t: (key: string) => string) => [
   {
-    label: "Eid Deals",
+    label: t("nav.eidDeals"),
     href: "/category/eid-deals",
     highlight: true,
   },
   {
-    label: "iPhones",
+    label: t("nav.iphones"),
     href: "/category/iphones",
     children: [
-      { label: "iPhone 16 Series", href: "/category/iphone-16" },
-      { label: "iPhone 15 Series", href: "/category/iphone-15" },
-      { label: "iPhone 14 Series", href: "/category/iphone-14" },
-      { label: "iPhone 13 Series", href: "/category/iphone-13" },
-      { label: "iPhone 12 Series", href: "/category/iphone-12" },
-      { label: "iPhone 11 Series", href: "/category/iphone-11" },
-      { label: "iPhone SE Series", href: "/category/iphone-se" },
+      { label: t("nav.iphone16Series"), href: "/category/iphone-16" },
+      { label: t("nav.iphone15Series"), href: "/category/iphone-15" },
+      { label: t("nav.iphone14Series"), href: "/category/iphone-14" },
+      { label: t("nav.iphone13Series"), href: "/category/iphone-13" },
+      { label: t("nav.iphone12Series"), href: "/category/iphone-12" },
+      { label: t("nav.iphone11Series"), href: "/category/iphone-11" },
+      { label: t("nav.iphoneSeSeries"), href: "/category/iphone-se" },
     ],
   },
   {
-    label: "Samsung",
+    label: t("nav.samsung"),
     href: "/category/samsung",
     children: [
-      { label: "Galaxy S24 Series", href: "/category/galaxy-s24" },
-      { label: "Galaxy S23 Series", href: "/category/galaxy-s23" },
-      { label: "Galaxy S22 Series", href: "/category/galaxy-s22" },
-      { label: "Galaxy S21 Series", href: "/category/galaxy-s21" },
-      { label: "Galaxy Z Series", href: "/category/galaxy-z" },
-      { label: "Galaxy Note Series", href: "/category/galaxy-note" },
+      { label: t("nav.galaxyS24Series"), href: "/category/galaxy-s24" },
+      { label: t("nav.galaxyS23Series"), href: "/category/galaxy-s23" },
+      { label: t("nav.galaxyS22Series"), href: "/category/galaxy-s22" },
+      { label: t("nav.galaxyS21Series"), href: "/category/galaxy-s21" },
+      { label: t("nav.galaxyZSeries"), href: "/category/galaxy-z" },
+      { label: t("nav.galaxyNoteSeries"), href: "/category/galaxy-note" },
     ],
   },
   {
-    label: "MacBooks",
+    label: t("nav.macbooks"),
     href: "/category/macbooks",
     children: [
-      { label: "MacBook Pro", href: "/category/macbook-pro" },
-      { label: "MacBook Air", href: "/category/macbook-air" },
-      { label: "Apple iMac", href: "/category/imac" },
+      { label: t("nav.macbookPro"), href: "/category/macbook-pro" },
+      { label: t("nav.macbookAir"), href: "/category/macbook-air" },
+      { label: t("nav.appleImac"), href: "/category/imac" },
     ],
   },
   {
-    label: "Laptops",
+    label: t("nav.laptops"),
     href: "/category/laptops",
     children: [
-      { label: "Dell", href: "/category/dell" },
-      { label: "Lenovo", href: "/category/lenovo" },
-      { label: "HP", href: "/category/hp" },
-      { label: "Microsoft", href: "/category/microsoft" },
+      { label: t("nav.dell"), href: "/category/dell" },
+      { label: t("nav.lenovo"), href: "/category/lenovo" },
+      { label: t("nav.hp"), href: "/category/hp" },
+      { label: t("nav.microsoft"), href: "/category/microsoft" },
     ],
   },
-  { label: "iPads", href: "/category/ipads" },
-  { label: "Apple Watches", href: "/category/apple-watches" },
-  { label: "Accessories", href: "/category/accessories" },
+  { label: t("nav.ipads"), href: "/category/ipads" },
+  { label: t("nav.appleWatches"), href: "/category/apple-watches" },
+  { label: t("nav.accessories"), href: "/category/accessories" },
 ];
 
 // --- HERO BANNER ---
-export const heroBanner = {
-  title: "Certified Renewed Electronics",
-  subtitle: "Up to 60% off vs new. 12 months warranty. Free delivery.",
-  ctaText: "Shop Now",
+export const getHeroBanner = (t: (key: string) => string) => ({
+  title: t("hero.title"),
+  subtitle: t("hero.subtitle"),
+  ctaText: t("hero.ctaText"),
   ctaLink: "/category/iphones",
   backgroundImage: "https://images.unsplash.com/photo-1616348436168-de43ad0db179?w=1920&q=80",
-  sellTitle: "Sell your old device. Get Cash!",
-  sellCtaText: "Sell Now",
-  sellCtaLink: "#",
-};
+  sellTitle: t("hero.sellTitle"),
+  sellCtaText: t("hero.sellCtaText"),
+  sellCtaLink: "/sell",
+});
 
 // --- TRUST BADGES ---
-export const trustBadges = [
-  { icon: "shield", label: "12 Months Warranty" },
-  { icon: "truck", label: "Free Delivery" },
-  { icon: "refresh", label: "10 Days To Return" },
-  { icon: "creditCard", label: "Buy Now, Pay Later" },
+export const getTrustBadges = (t: (key: string) => string) => [
+  { icon: "shield", label: t("trust.warranty") },
+  { icon: "truck", label: t("trust.delivery") },
+  { icon: "refresh", label: t("trust.returns") },
+  { icon: "creditCard", label: t("trust.payment") },
 ];
 
 // --- CATEGORIES ---
 export const categories = [
+  { slug: "iphones", name: "iphones" },
+  { slug: "samsung", name: "samsung" },
+  { slug: "macbooks", name: "macbooks" },
+  { slug: "laptops", name: "laptops" },
+  { slug: "ipads", name: "ipads" },
+  { slug: "apple-watches", name: "apple-watches" },
+  { slug: "tvs", name: "tvs" },
+];
+
+export const getCategories = (t: (key: string) => string) => [
   {
-    name: "iPhones",
+    name: t("categories.iphones"),
     slug: "iphones",
     image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=400&q=80",
   },
   {
-    name: "Samsung",
+    name: t("categories.samsung"),
     slug: "samsung",
     image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80",
   },
   {
-    name: "MacBooks",
+    name: t("categories.macbooks"),
     slug: "macbooks",
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&q=80",
   },
   {
-    name: "Laptops",
+    name: t("categories.laptops"),
     slug: "laptops",
     image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&q=80",
   },
   {
-    name: "iPads",
+    name: t("categories.ipads"),
     slug: "ipads",
     image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&q=80",
   },
   {
-    name: "Apple Watches",
+    name: t("categories.appleWatches"),
     slug: "apple-watches",
     image: "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=400&q=80",
   },
   {
-    name: "TVs",
+    name: t("categories.tvs"),
     slug: "tvs",
     image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&q=80",
   },
   {
-    name: "Accessories",
+    name: t("categories.accessories"),
     slug: "accessories",
     image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&q=80",
   },
@@ -218,9 +230,9 @@ export const products: Product[] = [
     brand: "Apple",
     category: "iphones",
     slug: "iphone-14-pro-max",
-    image: "https://images.unsplash.com/photo-1660652501576-07c12bca7931?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1592286927505-1def25115558?w=600&q=80",
     images: [
-      "https://images.unsplash.com/photo-1660652501576-07c12bca7931?w=600&q=80",
+      "https://images.unsplash.com/photo-1592286927505-1def25115558?w=600&q=80",
     ],
     color: "Space Black",
     storage: "128 GB",
@@ -468,9 +480,9 @@ export const products: Product[] = [
     brand: "Samsung",
     category: "samsung",
     slug: "galaxy-s23-ultra",
-    image: "https://images.unsplash.com/photo-1644501635467-89a68793ea90?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80",
     images: [
-      "https://images.unsplash.com/photo-1644501635467-89a68793ea90?w=600&q=80",
+      "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80",
     ],
     color: "Phantom Black",
     storage: "256 GB",
@@ -493,9 +505,9 @@ export const products: Product[] = [
     brand: "Samsung",
     category: "samsung",
     slug: "galaxy-s22-ultra",
-    image: "https://images.unsplash.com/photo-1644501635467-89a68793ea90?w=600&q=80",
+    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80",
     images: [
-      "https://images.unsplash.com/photo-1644501635467-89a68793ea90?w=600&q=80",
+      "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=600&q=80",
     ],
     color: "Phantom Black",
     storage: "128 GB",
@@ -708,27 +720,27 @@ export const renewedInfo = {
 };
 
 // --- FOOTER ---
-export const footer = {
+export const getFooter = (t: (key: string) => string) => ({
   about: {
     companyName: "Revibe Technology FZ-LLC",
-    description: "Licensed by Dubai Development Authority",
+    description: t("footer.about"),
     address: "King Salman Bin Abdulaziz Al Saud Street, Dubai Internet City - Dubai - UAE",
   },
   links: {
     aboutUs: [
-      { label: "About Revibe", href: "/about" },
+      { label: t("footer.about"), href: "/about" },
       { label: "Shop", href: "/category/iphones" },
       { label: "Our Blog", href: "/blog" },
       { label: "Become a Seller", href: "/sell" },
     ],
     information: [
       { label: "Help Center & FAQ", href: "/help" },
-      { label: "Contact", href: "/contact" },
+      { label: t("footer.contact"), href: "/contact" },
       { label: "Terms & Conditions", href: "/terms" },
-      { label: "Privacy Policy", href: "/privacy" },
+      { label: t("footer.privacy"), href: "/privacy" },
     ],
     account: [
-      { label: "My Account", href: "/account" },
+      { label: t("account.title"), href: "/account" },
       { label: "Track Your Order", href: "/track" },
     ],
   },
@@ -742,7 +754,8 @@ export const footer = {
     facebook: "https://facebook.com",
     instagram: "https://instagram.com",
   },
-};
+  copyright: t("footer.copyright"),
+});
 
 // --- REVIEWS / TESTIMONIALS ---
 export const testimonials = [

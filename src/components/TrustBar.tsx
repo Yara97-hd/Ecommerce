@@ -1,4 +1,7 @@
-import { trustBadges } from "@/data/siteContent";
+"use client";
+
+import { getTrustBadges } from "@/data/siteContent";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Shield, Truck, RefreshCw, CreditCard } from "lucide-react";
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -9,6 +12,8 @@ const iconMap: Record<string, React.ReactNode> = {
 };
 
 export default function TrustBar() {
+  const { t } = useLanguage();
+  const trustBadges = getTrustBadges(t);
   return (
     <section className="bg-primary-light border-y border-primary/10">
       <div className="max-w-7xl mx-auto px-4 py-5">

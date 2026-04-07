@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { products as initialProducts, brand, type Product } from "@/data/siteContent";
+import { products as initialProducts, getBrand, type Product } from "@/data/siteContent";
 import { getDiscountPercent } from "@/lib/api";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -17,6 +18,8 @@ import {
 } from "lucide-react";
 
 export default function AdminProductsPage() {
+  const { t } = useLanguage();
+  const brand = getBrand(t);
   const [productList, setProductList] = useState<Product[]>(initialProducts);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
