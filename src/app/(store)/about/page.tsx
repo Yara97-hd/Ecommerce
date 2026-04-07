@@ -39,7 +39,7 @@ export default function AboutPage() {
   return (
     <div className="bg-white">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-20 px-4">
+      <section className="bg-linear-to-br from-primary/10 to-primary/5 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             About Revibe
